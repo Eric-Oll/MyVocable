@@ -1,2 +1,4 @@
 __pycache__
+.spyproject
 *.csv
+calcul_ratio.py
