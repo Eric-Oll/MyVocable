@@ -318,23 +318,23 @@ class MyDico:
             try:
                 self.words.sort(key=lambda translate: translate[EN])
             except BaseException as err:
-                log.error("MyDico.sortDico : Erreur sur le tri en anglais :{}".format(err))
+                log.error("MyDico.sort_dico : Erreur sur le tri en anglais :{}".format(err))
         elif sortby == FR:
             try:
                 self.words.sort(key=lambda translate: translate[FR])
             except Exception:
-                log.error("MyDico.sortDico : Erreur sur le tri en franÃ§ais.")
+                log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
         elif sortby == EN_RATIO:
             try:
                 self.words.sort(key=lambda translate: translate.en_ratio_ok)
             except Exception:
-                log.error("MyDico.sortDico : Erreur sur le tri en franÃ§ais.")
+                log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
         elif sortby == FR_RATIO:
             try:
                 self.words.sort(key=lambda translate: translate.ratioValue(FR))
                 # self.words.sort(key=lambda translate: translate.fr_ratio_ok)
             except Exception:
-                log.error("MyDico.sortDico : Erreur sur le tri en franÃ§ais.")
+                log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
     #\sort_dico
 
     def shot_word(self, langue=EN):

@@ -14,7 +14,7 @@ This module can be running directly with the standard command :
 # -----------------------
 import configparser
 from tkinter import Tk, Frame, Menu, Canvas, PhotoImage
-from tkinter import W
+from tkinter import W, NSEW
 from tkinter.filedialog import LoadFileDialog
 import logging as log
 
@@ -45,6 +45,9 @@ class MyVocableApp(Tk):
         self.training_en = None    # Ecran d'entrainement en anglais
         self.training_fr = None    # Ecran d'entrainement en Français
         self.grid()
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
 
         # Lecture des données de configuration
         self.config_file = configparser.ConfigParser()
@@ -127,7 +130,7 @@ class MyVocableApp(Tk):
     # ------------ Méthodes Event ------------
     def on_quit_event(self):
         """Method used when the 'quit' menu item is activate"""
-        self.onSave()
+        self.on_save_event()
         self.quit()
     #\on_quit_event
 
@@ -185,6 +188,7 @@ class MyVocableApp(Tk):
         if frame == FRAME_MANAGEDICO:
             if self.manage_dico_frame is None:
                 self.manage_dico_frame = ManageMyDico(self, self.dico)
+                self.manage_dico_frame.grid(row=0, column=0, sticky=NSEW)
             else:
                 self.manage_dico_frame.show()
         else:
@@ -195,17 +199,18 @@ class MyVocableApp(Tk):
         if frame == FRAME_TRAININGEN:
             if self.training_en is None:
                 self.training_en = MyDicoTraining(self, self.dico, EN_TO_FR)
+                self.training_en.grid(row=0, column=0, sticky=NSEW)
             else:
                 self.training_en.show()
         else:
             if self.training_en is not None:
                 self.training_en.grid_remove()
 
-
         # Entrainement en français
         if frame == FRAME_TRAININGFR:
             if self.training_fr is None:
                 self.training_fr = MyDicoTraining(self, self.dico, FR_TO_EN)
+                self.training_fr.grid(row=0, column=0, sticky=NSEW)
             else:
                 self.training_fr.show()
         else:

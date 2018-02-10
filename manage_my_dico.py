@@ -8,7 +8,7 @@ This module contains the 'ManageMyDico' Frame
 # Importation des modules
 # -----------------------
 from tkinter import Frame, Label, LabelFrame, Entry, Button, Radiobutton, StringVar
-from tkinter import W, E, EW, END
+from tkinter import W, E, EW, NSEW, END
 #from tkinter.constants import *
 from tkinter.messagebox import showwarning
 import logging as log
@@ -45,7 +45,7 @@ class ManageMyDico(Frame):
 
         # Liste des mots
         self.word_list_frame = WordListFrame(self)
-        self.word_list_frame.grid(row=0, column=0, rowspan=5, sticky='nesw')
+        self.word_list_frame.grid(row=0, column=0, rowspan=5, sticky=NSEW)
         self.word_list_frame.bind('<<change-Index>>', self.on_select_event)
 
         # Option de tri
@@ -104,7 +104,12 @@ class ManageMyDico(Frame):
         self.quit_button = Button(self, text="Sortir",
                                   command=self.on_quit_event)
         self.quit_button.grid(row=2, column=1, padx=5, pady=5, sticky=E)
+
         self.grid()
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.bind("<Configure>", self.on_resize_event)
+
     #\create_frame
 
     # ------------ Méthodes Event ------------
@@ -195,6 +200,12 @@ class ManageMyDico(Frame):
         self.dico.sort_dico(self.sort_option.get())
         self.update_list()
     #\on_sort_event
+
+    def on_resize_event(self, event):
+        """Method used when the frame shape resize"""
+        self.width = event.width
+        self.height = event.height
+        log.debug("New size 'ManageMyDico' : {}x{}".format(self.width, self.height))
 
     def on_quit_event(self):
         """Method used when the quit_button is activated."""

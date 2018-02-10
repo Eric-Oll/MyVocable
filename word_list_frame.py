@@ -7,7 +7,8 @@ WordListFrame : Widget to display the list of words' dictionnary
 # Importation des modules
 # -----------------------
 from tkinter import Frame, Label, Scrollbar, Listbox
-from tkinter import NS, END, DOTBOX, SINGLE
+from tkinter import NS, NSEW, END, DOTBOX, SINGLE
+import logging as log
 #from tkinter.constants import *
 #from tkinter.messagebox import *
 #from my_dico import MyDico
@@ -64,14 +65,23 @@ class WordListFrame(Frame):
                                  selectmode=SINGLE,
                                  yscrollcommand=self.y_scroll.set)
         self.y_scroll.config(command=self.yview)
-        self.col1_list.grid(row=1, column=0, sticky=NS)
-        self.col2_list.grid(row=1, column=1, sticky=NS)
-        self.col3_list.grid(row=1, column=2, sticky=NS)
-        self.y_scroll.grid(row=1, column=3, sticky=NS)
+        self.col1_list.grid(row=1, column=0, sticky=NSEW)
+        self.col2_list.grid(row=1, column=1, sticky=NSEW)
+        self.col3_list.grid(row=1, column=2, sticky=NSEW)
+        self.y_scroll.grid(row=1, column=3, sticky=NSEW)
 
+#        self.col1_list.bind("<<MouseWheel>>", self.on_select_col1_event)
+#        self.col2_list.bind("<<MouseWheel>>", self.on_select_col2_event)
+#        self.col3_list.bind("<<MouseWheel>>", self.on_select_col3_event)
         self.col1_list.bind("<<ListboxSelect>>", self.on_select_col1_event)
         self.col2_list.bind("<<ListboxSelect>>", self.on_select_col2_event)
         self.col3_list.bind("<<ListboxSelect>>", self.on_select_col3_event)
+
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
+
     #\make_frame
 
     def yview(self, args1, arg2, arg3=None, arg4=None):
@@ -80,11 +90,6 @@ class WordListFrame(Frame):
         self.col2_list.yview(args1, arg2, arg3, arg4)
         self.col3_list.yview(args1, arg2, arg3, arg4)
     #\yview
-
-    def grid(self, **args):
-        """Display the frame"""
-        super().grid(args)
-    #\grid
 
     # ------------ Méthodes Event ------------
     def on_change_index(self):

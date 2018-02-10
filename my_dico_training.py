@@ -147,9 +147,12 @@ class MyDicoTraining(Frame):
             self.word_asked_label["text"] = "Mot en français : "
             self.response_label["text"] = "Mot en anglais : "
         else:
-            log.error("MyDicoTraining.makeGUI : Mode d'entrainement non défini.")
+            log.error("MyDicoTraining.make_frame : Mode d'entrainement non défini.")
 
         self.grid()
+        self.rowconfigure(6, weight=1)
+        self.columnconfigure(2, weight=1)
+        self.bind("<Configure>", self.on_resize_event)
 
     #\make_frame
 
@@ -198,6 +201,12 @@ class MyDicoTraining(Frame):
         # self.grid_remove()
         # self.master.onCloseFrame()
     #\ on_quit_event
+
+    def on_resize_event(self, event):
+        """Method used when the windows shape resize"""
+        self.width = event.width
+        self.height = event.height
+
 
     # ------------ Méthodes ------------
     def show(self):
