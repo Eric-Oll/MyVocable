@@ -8,12 +8,6 @@ WordListFrame : Widget to display the list of words' dictionnary
 # -----------------------
 from tkinter import Frame, Label, Scrollbar, Listbox
 from tkinter import NSEW, END, DOTBOX, SINGLE
-import logging as log
-log.basicConfig(level=log.DEBUG)
-
-#from tkinter.constants import *
-#from tkinter.messagebox import *
-#from my_dico import MyDico
 
 BG_UNSELECTED_COLOR = 'white'
 FG_UNSELECTED_COLOR = 'black'
@@ -91,13 +85,6 @@ class WordListFrame(Frame):
         self.col2_list.yview(*args)
         self.col3_list.yview(*args)
     #\yview
-
-#    def yview(self, args1, arg2, arg3=None, arg4=None):
-#        """Regroupe les évènements yview pour l'ensemble des listes"""
-#        self.col1_list.yview(args1, arg2, arg3, arg4)
-#        self.col2_list.yview(args1, arg2, arg3, arg4)
-#        self.col3_list.yview(args1, arg2, arg3, arg4)
-#    #\yview
 
     # ------------ Méthodes Event ------------
     def on_change_index(self):

@@ -30,6 +30,7 @@ The columns are :
 #import string
 import random
 import logging as log
+from unicodedata import normalize
 
 # --------------------
 # Constantes
@@ -306,22 +307,23 @@ class MyDico:
             file.close()
     #\save_dico
 
-    def add_translate(self, translate):
+    def add_translation(self, translate):
         "Ajoute une traduction au dictionnaire"
         self.words.append(translate)
-    #\add_translate
+    #\add_translation
 
 #OPT : Réduire les différent cas de type de tri par un seul cas générique
     def sort_dico(self, sortby=EN):
         "Trie le dictionnaire"
         if sortby == EN:
             try:
-                self.words.sort(key=lambda translate: translate[EN])
+                self.words.sort(key=lambda translate: translate[EN].lower())
             except BaseException as err:
                 log.error("MyDico.sort_dico : Erreur sur le tri en anglais :{}".format(err))
         elif sortby == FR:
             try:
-                self.words.sort(key=lambda translate: translate[FR])
+                self.words.sort(key=lambda translate: \
+                                normalize('NFKD',translate[FR]).encode('ascii','ignore').lower())
             except Exception:
                 log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
         elif sortby == EN_RATIO:

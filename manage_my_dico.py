@@ -67,7 +67,6 @@ class ManageMyDico(Frame):
         self.fr_option.grid(row=0, column=1, sticky=E)
         self.en_option.select()
 
-
         # Détail des mots / Modif
         self.detail_frame = LabelFrame(self, bd=1, relief="solid")
         self.detail_frame.grid(row=1, column=1, padx=5, pady=5, ipadx=5, ipady=5)
@@ -132,7 +131,7 @@ class ManageMyDico(Frame):
             return
 
         # Ajout dans le dictionnaire
-        self.dico.addTranslate(MyTranslate(
+        self.dico.add_translation(MyTranslate(
             en=self.en_entry.get(),
             fr=self.fr_entry.get(),
             info=self.info_entry.get()
@@ -224,14 +223,19 @@ class ManageMyDico(Frame):
         # Vide la liste existante
         self.word_list_frame.delete(0, END)
 
+        # Update header if the list
+        if self.sort_option.get() == EN:
+            self.word_list_frame.set_title(("Anglais", "Français", "Info"))
+        else:
+            self.word_list_frame.set_title(("Français", "Anglais", "Info"))
+
         # Recharge la liste des mots
+        self.dico.sort_dico(self.sort_option.get())
         for translate in self.dico.words:
             if self.sort_option.get() == EN:
-                self.word_list_frame.set_title(("Anglais", "Français", "Info"))
                 self.word_list_frame.insert(END,
                                             (translate["EN"], translate["FR"], translate["INFO"]))
             else:
-                self.word_list_frame.set_title(("Français", "Anglais", "Info"))
                 self.word_list_frame.insert(END,
                                             (translate["FR"], translate["EN"], translate["INFO"]))
     #\update_list
