@@ -1,4 +1,8 @@
 __pycache__
 .spyproject
 *.csv
+*.png
+*.jpg
+*.bmp
+*.gif
 calcul_ratio.py
