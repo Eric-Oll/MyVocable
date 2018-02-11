@@ -23,7 +23,10 @@ from manage_my_dico import ManageMyDico
 from my_dico_training import MyDicoTraining, FR_TO_EN, EN_TO_FR
 
 from my_vocable_constantes import APP_TITLE, INI_FILE, WIDTH_DEFAULT, HEIGHT_DEFAULT
-from my_vocable_constantes import FRAME_DEFAULT, FRAME_MANAGEDICO, FRAME_TRAININGEN, FRAME_TRAININGFR
+from my_vocable_constantes import FRAME_DEFAULT
+from my_vocable_constantes import FRAME_MANAGEDICO
+from my_vocable_constantes import FRAME_TRAININGEN
+from my_vocable_constantes import FRAME_TRAININGFR
 
 # **********************
 # *  Classe MyDicoApp  *

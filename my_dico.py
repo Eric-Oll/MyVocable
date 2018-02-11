@@ -323,7 +323,7 @@ class MyDico:
         elif sortby == FR:
             try:
                 self.words.sort(key=lambda translate: \
-                                normalize('NFKD',translate[FR]).encode('ascii','ignore').lower())
+                                normalize('NFKD', translate[FR]).encode('ascii', 'ignore').lower())
             except Exception:
                 log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
         elif sortby == EN_RATIO:
@@ -368,10 +368,7 @@ class FormatError(Exception):
 
 # ==>  autotest -------------------------------------------------------------------
 if __name__ == '__main__':
-    #import sys
-    #sys.path.append("C:\\Users\\eollivie\Documents\\Application\\BankPerfect8\\Scripts\\MyScriptBP")
-
-    dico = MyDico("C:\\Users\\eollivie\\Documents\\Labo\\Pyhton\\MyVocable\\dico.csv")
+    dico = MyDico("dico.csv")
     dico.load_dico()
     print(len(dico.words))
     for word in dico.words:
