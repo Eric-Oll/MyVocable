@@ -82,15 +82,13 @@ class MyVocableApp(Tk):
 
         cnv = Canvas(self.default_frame,
                      width=WIDTH_DEFAULT,
-                     height=HEIGHT_DEFAULT
-                     #, bg="white"
-                     )
+                     height=HEIGHT_DEFAULT)
         cnv.grid(row=1, column=0, sticky=W, pady=20)
 
         try:
             self.img_fr_en = PhotoImage(file=self.config_file['APP']['DefaultImage'])
             cnv.create_image(WIDTH_DEFAULT/2, HEIGHT_DEFAULT/2, image=self.img_fr_en)
-        except:
+        except Exception:
             log.error("MyVocableApp.makeDefaultFrame : Erreur de chargement de l'image : {}"
                       .format(self.config_file['APP']['DefaultImage']))
 
@@ -146,8 +144,8 @@ class MyVocableApp(Tk):
 
     def on_save_event(self):
         """Method used when the 'save' menu item is activate"""
-        if self.dico.FileName != "":
-            self.dico.saveDico()
+        if self.dico.filename != "":
+            self.dico.save_dico()
     #\on_save_event
 
     def on_english_training_event(self):

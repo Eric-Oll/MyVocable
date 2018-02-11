@@ -7,8 +7,10 @@ WordListFrame : Widget to display the list of words' dictionnary
 # Importation des modules
 # -----------------------
 from tkinter import Frame, Label, Scrollbar, Listbox
-from tkinter import NS, NSEW, END, DOTBOX, SINGLE
+from tkinter import NSEW, END, DOTBOX, SINGLE
 import logging as log
+log.basicConfig(level=log.DEBUG)
+
 #from tkinter.constants import *
 #from tkinter.messagebox import *
 #from my_dico import MyDico
@@ -17,7 +19,6 @@ BG_UNSELECTED_COLOR = 'white'
 FG_UNSELECTED_COLOR = 'black'
 BG_SELECTED_COLOR = 'blue'
 FG_SELECTED_COLOR = 'white'
-
 
 # **************************
 # *  Classe WordListFrame  *
@@ -70,9 +71,9 @@ class WordListFrame(Frame):
         self.col3_list.grid(row=1, column=2, sticky=NSEW)
         self.y_scroll.grid(row=1, column=3, sticky=NSEW)
 
-#        self.col1_list.bind("<<MouseWheel>>", self.on_select_col1_event)
-#        self.col2_list.bind("<<MouseWheel>>", self.on_select_col2_event)
-#        self.col3_list.bind("<<MouseWheel>>", self.on_select_col3_event)
+        self.col1_list.bind("<MouseWheel>", self.on_scrol1_event)
+        self.col2_list.bind("<MouseWheel>", self.on_scrol1_event)
+        self.col3_list.bind("<MouseWheel>", self.on_scrol1_event)
         self.col1_list.bind("<<ListboxSelect>>", self.on_select_col1_event)
         self.col2_list.bind("<<ListboxSelect>>", self.on_select_col2_event)
         self.col3_list.bind("<<ListboxSelect>>", self.on_select_col3_event)
@@ -84,12 +85,19 @@ class WordListFrame(Frame):
 
     #\make_frame
 
-    def yview(self, args1, arg2, arg3=None, arg4=None):
+    def yview(self, *args):
         """Regroupe les évènements yview pour l'ensemble des listes"""
-        self.col1_list.yview(args1, arg2, arg3, arg4)
-        self.col2_list.yview(args1, arg2, arg3, arg4)
-        self.col3_list.yview(args1, arg2, arg3, arg4)
+        self.col1_list.yview(*args)
+        self.col2_list.yview(*args)
+        self.col3_list.yview(*args)
     #\yview
+
+#    def yview(self, args1, arg2, arg3=None, arg4=None):
+#        """Regroupe les évènements yview pour l'ensemble des listes"""
+#        self.col1_list.yview(args1, arg2, arg3, arg4)
+#        self.col2_list.yview(args1, arg2, arg3, arg4)
+#        self.col3_list.yview(args1, arg2, arg3, arg4)
+#    #\yview
 
     # ------------ Méthodes Event ------------
     def on_change_index(self):
@@ -123,6 +131,11 @@ class WordListFrame(Frame):
                                   background=BG_UNSELECTED_COLOR,
                                   foreground=FG_UNSELECTED_COLOR)
     #\on_lose_selection
+
+# BUG : Revoir le fonctionnement du scroll via la souris
+    def on_scrol1_event(self, event):
+        """Method used when de MouseWheel is actived"""
+        self.yview("scroll", event.delta, "units")
 
     def on_select_col1_event(self, event):
         "Selectionne dans la colonne 1"
