@@ -7,16 +7,19 @@ This module contains the 'ManageMyDico' Frame
 # -----------------------
 # Importation des modules
 # -----------------------
-from tkinter import Frame, Label, LabelFrame, Entry, Button, Radiobutton, StringVar
-from tkinter import W, E, EW, NSEW, END
+from tkinter import Frame, Label, LabelFrame, Entry, Button
+from tkinter import Radiobutton, StringVar, Listbox
+from tkinter import W, E, EW, NS, NSEW, END
 #from tkinter.constants import *
 from tkinter.messagebox import showwarning
 import logging as log
 
 from word_list_frame import WordListFrame
-from my_dico import MyTranslate, EN, FR, INFO
+from my_dico import MyTranslation, EN, FR, INFO
 
 from my_vocable_constantes import FRAME_DEFAULT
+
+# TODO : Ajouter la gestion des categories
 
 # =============================================================================
 # Classe ManageMyDico
@@ -69,44 +72,68 @@ class ManageMyDico(Frame):
 
         # Détail des mots / Modif
         self.detail_frame = LabelFrame(self, bd=1, relief="solid")
-        self.detail_frame.grid(row=1, column=1, padx=5, pady=5, ipadx=5, ipady=5)
+        self.detail_frame.grid(row=1, column=1, padx=5, pady=5, ipadx=5, ipady=5, sticky=NSEW)
+        self.detail_frame.rowconfigure(3, weight=1)
+        self.detail_frame.columnconfigure(1, weight=1)
 
+        # ... English
         self.en_label = Label(self.detail_frame, text="Mot en anglais")
         self.en_label.grid(row=0, sticky=W, padx=5, pady=5)
-
         self.en_entry = Entry(self.detail_frame)
-        self.en_entry.grid(row=0, column=1, columnspan=2, padx=5, pady=5)
+        self.en_entry.grid(row=0, column=1, columnspan=2, padx=5, pady=5, sticky=EW)
 
+        # ... French
         self.fr_label = Label(self.detail_frame, text="Mot en français")
         self.fr_label.grid(row=1, sticky=W, padx=5, pady=5)
-
         self.fr_entry = Entry(self.detail_frame)
-        self.fr_entry.grid(row=1, column=1, columnspan=2, padx=5, pady=5)
+        self.fr_entry.grid(row=1, column=1, columnspan=2, padx=5, pady=5, sticky=EW)
 
+        # ... Info
         self.info_label = Label(self.detail_frame, text="Info complémentaire")
         self.info_label.grid(row=2, sticky=W, padx=5, pady=5)
-
         self.info_entry = Entry(self.detail_frame, width=20)
-        self.info_entry.grid(row=2, column=1, columnspan=2, padx=5, pady=5)
+        self.info_entry.grid(row=2, column=1, columnspan=2, padx=5, pady=5, sticky=EW)
+
+        # ... Categories
+        self.categories_group = LabelFrame(self.detail_frame, bd=1, relief="solid", text="Catégories")
+        self.categories_group.grid(row=3, columnspan=3, padx=5, pady=5, sticky=NSEW)
+
+        self.selected_categories = Listbox(self.categories_group)
+        self.selected_categories.grid(row=0, column=0, rowspan=4, padx=5, pady=5, sticky=NSEW)
+
+        self.available_categories = Listbox(self.categories_group)
+        self.available_categories.grid(row=0, column=2, rowspan=4, padx=5, pady=5, sticky=NSEW)
+
+        self.add_categ_button = Button(self.categories_group, text="<<")
+        self.add_categ_button.grid(row=1, column=1, padx=5, pady=5 )
+
+        self.del_categ_button = Button(self.categories_group, text=">>")
+        self.del_categ_button.grid(row=2, column=1, padx=5, pady=5)
+
+        self.categories_group.rowconfigure(0, weight=1)
+        self.categories_group.rowconfigure(3, weight=1)
+        self.categories_group.columnconfigure(0, weight=1)
+        self.categories_group.columnconfigure(2, weight=1)
 
         # Bouton d'actions
         self.add_button = Button(self.detail_frame, text="Ajouter",
                                  command=self.on_add_event)
-        self.add_button.grid(row=3, column=0, padx=10, pady=5)
+        self.add_button.grid(row=4, column=0, padx=10, pady=5)
         self.modify_button = Button(self.detail_frame, text="Modifier",
                                     command=self.on_modify_event)
-        self.modify_button.grid(row=3, column=1, padx=10, pady=5)
+        self.modify_button.grid(row=4, column=1, padx=10, pady=5)
         self.delete_button = Button(self.detail_frame, text="Supprimer",
                                     command=self.on_delete_event)
-        self.delete_button.grid(row=3, column=2, padx=10, pady=5)
+        self.delete_button.grid(row=4, column=2, padx=10, pady=5)
 
         self.quit_button = Button(self, text="Sortir",
                                   command=self.on_quit_event)
         self.quit_button.grid(row=2, column=1, padx=5, pady=5, sticky=E)
 
         self.grid()
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
         self.bind("<Configure>", self.on_resize_event)
 
     #\create_frame
@@ -131,11 +158,11 @@ class ManageMyDico(Frame):
             return
 
         # Ajout dans le dictionnaire
-        self.dico.add_translation(MyTranslate(
+        self.dico.add_translation(MyTranslation(
             en=self.en_entry.get(),
             fr=self.fr_entry.get(),
             info=self.info_entry.get()
-        ))
+        )) # TODO : Ajouter les categories auxquelles sont liées la traduction
 
         self.en_entry.delete(0, END)
         self.fr_entry.delete(0, END)
@@ -167,6 +194,7 @@ class ManageMyDico(Frame):
         self.dico.words[self.word_list_frame.index].set(EN, self.en_entry.get())
         self.dico.words[self.word_list_frame.index].set(FR, self.fr_entry.get())
         self.dico.words[self.word_list_frame.index].set(INFO, self.info_entry.get())
+# TODO : Ajouter les modiffication des categorires
 
         self.en_entry.delete(0, END)
         self.fr_entry.delete(0, END)
