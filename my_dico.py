@@ -46,6 +46,7 @@ FR_ERR_COUNT = "FR_ERROR"
 FR_RATIO = "FR_RATIO"
 
 
+# TODO : Inclure la notion de classification des traductions. Cela permettra de réviser par thèmes
 
 # =============================================================================
 # Classe MyTranslate
