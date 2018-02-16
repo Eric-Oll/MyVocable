@@ -14,6 +14,8 @@ The file is a CSV-file with semi-comma separator and with header.
 The columns are :
  - english word or expression (Mot ou expression anglaise)
  - french word or expression (Mot ou expression française)
+ - Information about the mean of the words
+ - Categories of the words (=list with comma-separator)
  - english to french selecting translation counter
      (Nombre de fois que la traduction a été présentée en anglais)
  - english to franch translating error counter
@@ -38,6 +40,7 @@ from unicodedata import normalize
 EN = "EN"
 FR = "FR"
 INFO = "INFO"
+CATEGORIES = "CATEGORIES"
 EN_COUNT = "EN_COUNT"
 EN_ERR_COUNT = "EN_ERROR"
 EN_RATIO = "EN_RATIO"
@@ -45,56 +48,57 @@ FR_COUNT = "FR_COUNT"
 FR_ERR_COUNT = "FR_ERROR"
 FR_RATIO = "FR_RATIO"
 
-
-# TODO : Inclure la notion de classification des traductions. Cela permettra de réviser par thèmes
+# TODO : Ajouter un scoring
+# TODO : Ajouter une relation n-n à la traduction
 
 # =============================================================================
 # Classe MyTranslate
 # =============================================================================
-class MyTranslate:
+class MyTranslation:
     """"Translating item (Item de traduction)"""
 
     # ------------ Constructeur  & Surcharge opÃ©rateur ------------
-    def __init__(self, en="", fr="", info="",
-                 en_count=0, en_error=0,
-                 fr_count=0, fr_error=0,
+    def __init__(self, en="", fr="", info="", categories=[],
+                 en_count=0, en_error=0, fr_count=0, fr_error=0,
                  lineDico=""):
         """Constructeur de la classe MyTranslate"""
         if lineDico != "":
             log.debug("Création de la ligne {}".format(lineDico))
             line = lineDico.split(";")
             log.debug("Nombre de composant de la ligne : {}".format(len(line)))
-            if len(line) == 7:
+            if len(line) == 8:
                 self.en_word = line[0]
                 log.debug("Mot anglais : {}".format(self[EN]))
                 self.fr_word = line[1]
                 log.debug("Mot franÃ§ais : {}".format(self[FR]))
                 self.info_word = line[2]
                 log.debug("Information de traduction : {}".format(self[INFO]))
-                self.en_count = line[3]
+                self.categories = line[3].split(",")
+                self.en_count = line[4]
                 log.debug("Compteur de proposition de mots anglais : {}".format(self[EN_COUNT]))
                 try:
-                    self.en_err_count = line[4]
+                    self.en_err_count = line[5]
                 except Exception:
                     log.error("MyTranslate.__init__ : Problème dans l'écriture \
                               du compteur d'erreur de mots anglais : {} de type {}"
-                              .format(line[4], type(line[4])))
+                              .format(line[5], type(line[5])))
                 try:
-                    self.fr_count = line[5]
+                    self.fr_count = line[6]
                 except Exception:
                     log.error("MyTranslate.__init__ : Problème dans l'écriture \
                               du compteur de proposition de mots français : {} de type {}"
-                              .format(line[5], type(line[5])))
+                              .format(line[6], type(line[6])))
                 try:
-                    self.fr_err_count = line[6]
+                    self.fr_err_count = line[7]
                 except Exception:
                     log.error("MyTranslate.__init__ : Problème dans l'écriture \
                               du compteur d'erreur de mots français : {} de type {}"
-                              .format(line[6], type(line[6])))
+                              .format(line[7], type(line[7])))
             elif len(line) == 2:
                 self.en_word = line[0]
                 self.fr_word = line[1]
                 self.info_word = info
+                self.categories = categories
                 self.en_count = en_count
                 self.en_err_count = en_error
                 self.fr_count = fr_count
@@ -103,6 +107,7 @@ class MyTranslate:
                 self.en_word = line[0]
                 self.fr_word = line[1]
                 self.info_word = line[2]
+                self.categories = categories
                 self.en_count = en_count
                 self.en_err_count = en_error
                 self.fr_count = fr_count
@@ -113,6 +118,7 @@ class MyTranslate:
             self.en_word = en
             self.fr_word = fr
             self.info_word = info
+            self.categories = categories
             self.en_count = en_count
             self.en_err_count = en_error
             self.fr_count = fr_count
@@ -149,15 +155,18 @@ class MyTranslate:
     def get(self, option=""):
         """"Retour les Ã©lÃ©ments de traduction"""
         if option == "" or option == "ALL":
-            return "{};{};{};{};{};{};{}".format(self.en_word, self.fr_word, self.info_word,
-                                                 self.en_count, self.en_err_count,
-                                                 self.fr_count, self.fr_err_count)
+            return "{};{};{};{};{};{};{};{}".format(self.en_word, self.fr_word,
+                                                    self.info_word, self.categories,
+                                                    self.en_count, self.en_err_count,
+                                                    self.fr_count, self.fr_err_count)
         elif option == EN:
             return self.en_word
         elif option == FR:
             return self.fr_word
         elif option == INFO:
             return self.info_word
+        elif option == CATEGORIES:
+            return self.categories
         elif option == EN_COUNT:
             return int(self.en_count)
         elif option == EN_ERR_COUNT:
@@ -183,6 +192,8 @@ class MyTranslate:
                 self.fr_word = value
             elif option == INFO:
                 self.info_word = value
+            elif option == CATEGORIES:
+                self.categories = value
             elif option == EN_COUNT:
                 self.en_count = int(value)
                 self.update_english_stats()
@@ -203,6 +214,18 @@ class MyTranslate:
             log.error("MyTranslate.set : Erreur sur option '{}' avec la valeur \
                       '{}' de type '{}'".format(option, value, type(value)))
     #\set
+
+    def add_category(self, category):
+        """Add a new category for this translation"""
+        if category not in self.categories:
+            self.categories.append(category)
+
+
+    def del_category(self, category):
+        """Remove a category from this translation"""
+        if category in self.categories:
+            self.categories.remove(category)
+    # TODO : ajouter une exception de type Warning si tentative ce suppression une valeur absente
 
     def update_english_stats(self):
         """Update the stats for english indicators"""
@@ -245,13 +268,13 @@ class MyDico:
         "Constructeur de la classe MyDico"
         self.filename = fichier
         self.words = []
+        self.categories = []
     #\__init__
 
-#    def count(self):
     def __len__(self):
         """Return the size of the dictionnary"""
         return len(self.words)
-    #\count
+    #\__len__
 
     # ------------ MÃ©thodes ------------
     def load_dico(self, fichier=""):
@@ -268,14 +291,15 @@ class MyDico:
 
         #Réinitialisation du dictionnaire
         self.words = []
+        self.categories = []
 
         # Lecture du dictionnaire
         nb_ignore = 0
         lineread = file.readline()
         while lineread != "":
             try:
-                translate = MyTranslate(lineDico=lineread.replace("\n", ""))
-                self.words.append(translate)
+                translation = MyTranslation(lineDico=lineread.replace("\n", ""))
+                self.add_translation(translation)
             except FormatError as err:
                 nb_ignore += 1
                 log.error("Ligne en erreur : {} ; nb d'arguments = {}"
@@ -308,10 +332,20 @@ class MyDico:
             file.close()
     #\save_dico
 
-    def add_translation(self, translate):
+    def add_translation(self, translation):
         "Ajoute une traduction au dictionnaire"
-        self.words.append(translate)
+        self.words.append(translation)
+
+        # Check if new category exists
+        for category in translation.categories:
+            self.add_category(category)
     #\add_translation
+
+    def add_category(self, category):
+        """Add a new category in the dictionnary if not exist yet"""
+        if category not in self.categories:
+            self.categories.append(category)
+    #\add_category
 
 #OPT : Réduire les différent cas de type de tri par un seul cas générique
     def sort_dico(self, sortby=EN):
