@@ -9,9 +9,7 @@ MyDicoTraining : Training Frame
 from tkinter import Frame, Label, Entry, Button, LabelFrame, StringVar
 from tkinter import E, W, EW, SE, NE, LEFT, END
 from tkinter.ttk import Combobox
-#from tkinter.font import *
-#from tkinter.constants import *
-#from tkinter.messagebox import *
+
 import logging as log
 
 from my_dico import FR, FR_COUNT, FR_ERR_COUNT, FR_RATIO
@@ -168,16 +166,6 @@ class MyDicoTraining(Frame):
         self.columnconfigure(2, weight=1)
         self.bind("<Configure>", self.on_resize_event)
     #\make_frame
-
-    def init_category_combo(self):
-        """Setup the category list"""
-        import pdb; pdb.set_trace()
-        self.category_combo.delete(0, END)
-        self.category_combo.insert(END, "ALL")
-        for category in sorted(self.dico.categories):
-            self.category_combo.insert(END, category)
-        self.category_combo.set("ALL")
-
 
 
     # ------------ Méthodes Event ------------

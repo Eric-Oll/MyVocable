@@ -101,7 +101,10 @@ class MyTranslation:
         self.categories = []
         try:
             log.debug("list_args[3]={}".format(list_args[3]))
-            self[CATEGORIES] = list_args[3].split(",")
+            if isinstance(list_args[3],str):
+                self[CATEGORIES] = list_args[3].split(",")
+            elif isinstance(list_args[3], list):
+                self[CATEGORIES] = list_args[3]
         except IndexError:
             self.categories = []
 
