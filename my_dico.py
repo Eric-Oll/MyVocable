@@ -2,7 +2,7 @@
 
 """
 This module contains the class definition for the classes :
-    - MyTranslate
+    - MyTranslation
     - MyDico
     - FormatError(Exception)
 
@@ -52,7 +52,7 @@ FR_RATIO = "FR_RATIO"
 # TODO : Ajouter une relation n-n à la traduction
 
 # =============================================================================
-# Classe MyTranslate
+# Classe MyTranslation
 # =============================================================================
 class MyTranslation:
     """"Translating item (Item de traduction)"""
@@ -61,7 +61,7 @@ class MyTranslation:
     def __init__(self, en="", fr="", info="", categories=[],
                  en_count=0, en_error=0, fr_count=0, fr_error=0,
                  lineDico=""):
-        """Constructeur de la classe MyTranslate"""
+        """Constructeur de la classe MyTranslation"""
         if lineDico != "":
             log.debug("Création de la ligne {}".format(lineDico))
             line = lineDico.split(";")
@@ -79,19 +79,19 @@ class MyTranslation:
                 try:
                     self.en_err_count = line[5]
                 except Exception:
-                    log.error("MyTranslate.__init__ : Problème dans l'écriture \
+                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
                               du compteur d'erreur de mots anglais : {} de type {}"
                               .format(line[5], type(line[5])))
                 try:
                     self.fr_count = line[6]
                 except Exception:
-                    log.error("MyTranslate.__init__ : Problème dans l'écriture \
+                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
                               du compteur de proposition de mots français : {} de type {}"
                               .format(line[6], type(line[6])))
                 try:
                     self.fr_err_count = line[7]
                 except Exception:
-                    log.error("MyTranslate.__init__ : Problème dans l'écriture \
+                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
                               du compteur d'erreur de mots français : {} de type {}"
                               .format(line[7], type(line[7])))
             elif len(line) == 2:
@@ -146,7 +146,7 @@ class MyTranslation:
         try:
             self.set(option, value)
         except Exception:
-            log.error("MyTranslate.__setitem__ : Erreur sur option '{}' avec \
+            log.error("MyTranslation.__setitem__ : Erreur sur option '{}' avec \
                       la valeur '{}' de type '{}'"
                       .format(option, value, type(value)))
     #\__setitem__
@@ -211,7 +211,7 @@ class MyTranslation:
             elif option == FR_RATIO:
                 self.fr_ratio_ok = float(value)
         except Exception:
-            log.error("MyTranslate.set : Erreur sur option '{}' avec la valeur \
+            log.error("MyTranslation.set : Erreur sur option '{}' avec la valeur \
                       '{}' de type '{}'".format(option, value, type(value)))
     #\set
 
@@ -233,7 +233,7 @@ class MyTranslation:
             if self[EN_COUNT] != 0:
                 self[EN_RATIO] = float(self[EN_COUNT]-self[EN_ERR_COUNT])/self[EN_COUNT]
         except Exception:
-            log.debug("MyTranslate.update_english_stats : Erreur dans le calcul \
+            log.debug("MyTranslation.update_english_stats : Erreur dans le calcul \
                       du ratio avec EN_COUNT={} et EN_ERR_COUNT={}"
                       .format(self.en_count, self.en_err_count))
     #\update_english_stats
@@ -244,7 +244,7 @@ class MyTranslation:
             if int(self[FR_COUNT]) != 0:
                 self[FR_RATIO] = float(self[FR_COUNT]-self[FR_ERR_COUNT])/self[FR_COUNT]
         except Exception:
-            log.debug("MyTranslate.updateStatsFr : Erreur dans le calcul du ratio \
+            log.debug("MyTranslation.updateStatsFr : Erreur dans le calcul du ratio \
                       avec FR_COUNT={} et FR_ERR_COUNT={}"
                       .format(self.fr_count, self.fr_err_count))
     #\update_french_stats
