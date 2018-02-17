@@ -398,7 +398,7 @@ class MyDico:
                 log.error("MyDico.sort_dico : Erreur sur le tri en franÃ§ais.")
     #\sort_dico
 
-    def shot_word(self, langue=EN):
+    def shot_word(self, langue=EN, category="ALL"):
         "Selectionne une traduction"
         # langue = EN -> basÃ© sur les stat EN
         # langue = FR -> basÃ© sur les stat FR
@@ -408,11 +408,16 @@ class MyDico:
         if langue == FR:
             self.sort_dico(FR_RATIO)
 
+        if category != "ALL":
+            list_translations = [translation for translation in self.words if category in translation.categories]
+        else:
+            list_translations = self.words
+
         # On fait varier la borne sup. (rendre moins accessible les rÃ©ussite)
-        borne_sup = random.randint(1, len(self))
+        borne_sup = random.randint(1, len(list_translations))
 
         # On tire au hazard un Ã©lÃ©ment sur le segment restant
-        return random.choice(self.words[0:borne_sup])
+        return random.choice(list_translations[0:borne_sup])
     #\shot_word
 
 
