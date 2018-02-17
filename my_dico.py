@@ -30,23 +30,25 @@ The columns are :
 # Importation des modules
 # -----------------------
 #import string
+from unicodedata import normalize
 import random
 import logging as log
-from unicodedata import normalize
+log.basicConfig(level=log.DEBUG)
+
 
 # --------------------
 # Constantes
 # --------------------
-EN = "EN"
-FR = "FR"
-INFO = "INFO"
-CATEGORIES = "CATEGORIES"
-EN_COUNT = "EN_COUNT"
-EN_ERR_COUNT = "EN_ERROR"
-EN_RATIO = "EN_RATIO"
-FR_COUNT = "FR_COUNT"
-FR_ERR_COUNT = "FR_ERROR"
-FR_RATIO = "FR_RATIO"
+EN = "en"
+FR = "fr"
+INFO = "info"
+CATEGORIES = "categories"
+EN_COUNT = "en_count"
+EN_ERR_COUNT = "en_error"
+EN_RATIO = "en_ratio"
+FR_COUNT = "fr_count"
+FR_ERR_COUNT = "fr_error"
+FR_RATIO = "fr_ratio"
 
 # TODO : Ajouter un scoring
 # TODO : Ajouter une relation n-n à la traduction
@@ -58,71 +60,82 @@ class MyTranslation:
     """"Translating item (Item de traduction)"""
 
     # ------------ Constructeur  & Surcharge opÃ©rateur ------------
-    def __init__(self, en="", fr="", info="", categories=[],
-                 en_count=0, en_error=0, fr_count=0, fr_error=0,
-                 lineDico=""):
-        """Constructeur de la classe MyTranslation"""
-        if lineDico != "":
-            log.debug("Création de la ligne {}".format(lineDico))
-            line = lineDico.split(";")
-            log.debug("Nombre de composant de la ligne : {}".format(len(line)))
-            if len(line) == 8:
-                self.en_word = line[0]
-                log.debug("Mot anglais : {}".format(self[EN]))
-                self.fr_word = line[1]
-                log.debug("Mot franÃ§ais : {}".format(self[FR]))
-                self.info_word = line[2]
-                log.debug("Information de traduction : {}".format(self[INFO]))
-                self.categories = line[3].split(",")
-                self.en_count = line[4]
-                log.debug("Compteur de proposition de mots anglais : {}".format(self[EN_COUNT]))
-                try:
-                    self.en_err_count = line[5]
-                except Exception:
-                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
-                              du compteur d'erreur de mots anglais : {} de type {}"
-                              .format(line[5], type(line[5])))
-                try:
-                    self.fr_count = line[6]
-                except Exception:
-                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
-                              du compteur de proposition de mots français : {} de type {}"
-                              .format(line[6], type(line[6])))
-                try:
-                    self.fr_err_count = line[7]
-                except Exception:
-                    log.error("MyTranslation.__init__ : Problème dans l'écriture \
-                              du compteur d'erreur de mots français : {} de type {}"
-                              .format(line[7], type(line[7])))
-            elif len(line) == 2:
-                self.en_word = line[0]
-                self.fr_word = line[1]
-                self.info_word = info
-                self.categories = categories
-                self.en_count = en_count
-                self.en_err_count = en_error
-                self.fr_count = fr_count
-                self.fr_err_count = fr_error
-            elif len(line) == 3:
-                self.en_word = line[0]
-                self.fr_word = line[1]
-                self.info_word = line[2]
-                self.categories = categories
-                self.en_count = en_count
-                self.en_err_count = en_error
-                self.fr_count = fr_count
-                self.fr_err_count = fr_error
-            else:
-                raise FormatError(lineDico, len(line))
+    def __init__(self, *args, **kwargs):
+        """
+        Constructeur de la classe MyTranslation
+        The argument order is :
+            1. <en> or <csv-line>,
+            2. <fr>,
+            3. <info>,
+            4. <categories>,
+            5. <en_count>,
+            6. <en_err_count>,
+            7. <fr_count>,
+            8. <fr_err_count>
+        """
+        if len(args) == 1:
+            log.debug("Args[0]={}".format(args[0]))
+            list_args = args[0].split(";")
         else:
-            self.en_word = en
-            self.fr_word = fr
-            self.info_word = info
-            self.categories = categories
-            self.en_count = en_count
-            self.en_err_count = en_error
-            self.fr_count = fr_count
-            self.fr_err_count = fr_error
+            list_args = args
+        log.debug("Nombre d'arguments : {}".format(len(list_args)))
+
+        try:
+            self.en_word = list_args[0]
+            log.debug("Mot anglais : {}".format(self[EN]))
+        except IndexError:
+            self.en_word = ""
+
+        try:
+            self.fr_word = list_args[1]
+            log.debug("Mot français : {}".format(self[FR]))
+        except IndexError:
+            self.fr_word = ""
+
+        try:
+            self.info_word = list_args[2]
+            log.debug("Information de traduction : {}".format(self[INFO]))
+        except IndexError:
+            self.info_word = ""
+
+        try:
+            log.debug("type list_args[3]={}".format(type(list_args[3])))
+            log.debug("list_args[3]={}".format(list_args[3]))
+            if isinstance(list_args[3], str):
+                self.categories = list_args[3].split(",")
+            elif isinstance(list_args[3], list):
+                self.categories = list_args[3]
+            else:
+                raise ValueError("Error type for the categories argument")
+        except IndexError:
+            self.categories = []
+
+        try:
+            self.en_count = list_args[4]
+            log.debug("Compteur de proposition de mots anglais : {}".format(self[EN_COUNT]))
+        except IndexError:
+            self.en_count = 0
+
+        try:
+            self.en_err_count = list_args[5]
+            log.debug("Compteur d'erreur de mots anglais : {}".format(self[EN_COUNT]))
+        except IndexError:
+            self.en_err_count = 0
+
+        try:
+            self.fr_count = list_args[6]
+            log.debug("Compteur de proposition de mots français : {}".format(self[EN_COUNT]))
+        except IndexError:
+            self.fr_count = 0
+
+        try:
+            self.fr_err_count = list_args[7]
+            log.debug("Compteur d'erreur de mots français : {}".format(self[EN_COUNT]))
+        except IndexError:
+            self.fr_err_count = 0
+
+        for key in kwargs:
+            self[key] = kwargs[key]
 
         #Mise Ã  jour des stat
         self.en_ratio_ok = 0
@@ -298,7 +311,7 @@ class MyDico:
         lineread = file.readline()
         while lineread != "":
             try:
-                translation = MyTranslation(lineDico=lineread.replace("\n", ""))
+                translation = MyTranslation(lineread.replace("\n", ""))
                 self.add_translation(translation)
             except FormatError as err:
                 nb_ignore += 1

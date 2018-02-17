@@ -17,7 +17,7 @@ class TestMyVocable(TestCase):
         """ Test la création d'un objet MyTranslation"""
         fileline = "No, that's incorrect. In fact,;Non, pas du tout. En réalité, ...;Une info;adverbe,noms;4;3;2;1"
 
-        translation = MyTranslation(lineDico=fileline)
+        translation = MyTranslation(fileline)
         self.assertEqual(translation[EN], "No, that's incorrect. In fact,")
         self.assertEqual(translation[FR], "Non, pas du tout. En réalité, ...")
         self.assertEqual(translation[INFO], "Une info")
@@ -28,3 +28,16 @@ class TestMyVocable(TestCase):
         self.assertEqual(translation[FR_ERR_COUNT], 1)
         self.assertEqual(translation[EN_RATIO], 1/4)
         self.assertEqual(translation[FR_RATIO], 1/2)
+
+        translation = MyTranslation("Word", "Mot", "Info", ['Categorie'])
+        self.assertEqual(translation[EN], "Word")
+        self.assertEqual(translation[FR], "Mot")
+        self.assertEqual(translation[INFO], "Info")
+        self.assertListEqual(translation[CATEGORIES],['Categorie'])
+
+
+        translation = MyTranslation(en="Word", fr="Mot", info="Info", categories=['Categorie'])
+        self.assertEqual(translation[EN], "Word")
+        self.assertEqual(translation[FR], "Mot")
+        self.assertEqual(translation[INFO], "Info")
+        self.assertListEqual(translation[CATEGORIES],['Categorie'])
