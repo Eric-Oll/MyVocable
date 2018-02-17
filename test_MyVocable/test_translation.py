@@ -41,3 +41,10 @@ class TestMyVocable(TestCase):
         self.assertEqual(translation[FR], "Mot")
         self.assertEqual(translation[INFO], "Info")
         self.assertListEqual(translation[CATEGORIES],['Categorie'])
+
+    def test_get_all(self):
+        """Test la sérialisation des informations sous la forme d'une str"""
+        fileline = "too;aussi;info;adverbe;4;3;2;1"
+
+        translation = MyTranslation(fileline)
+        self.assertEqual(translation.get(),fileline)

@@ -8,14 +8,14 @@ This module contains the 'ManageMyDico' Frame
 # Importation des modules
 # -----------------------
 from tkinter import Frame, Label, LabelFrame, Entry, Button
-from tkinter import Radiobutton, StringVar, Listbox
-from tkinter import W, E, EW, NS, NSEW, END
+from tkinter import Radiobutton, StringVar, Listbox, Scrollbar
+from tkinter import W, E, EW, NS, NSEW, END, ACTIVE
 #from tkinter.constants import *
 from tkinter.messagebox import showwarning
 import logging as log
 
 from word_list_frame import WordListFrame
-from my_dico import MyTranslation, EN, FR, INFO
+from my_dico import MyTranslation, EN, FR, INFO, CATEGORIES
 
 from my_vocable_constantes import FRAME_DEFAULT
 
@@ -98,22 +98,39 @@ class ManageMyDico(Frame):
         self.categories_group = LabelFrame(self.detail_frame, bd=1, relief="solid", text="Catégories")
         self.categories_group.grid(row=3, columnspan=3, padx=5, pady=5, sticky=NSEW)
 
-        self.selected_categories = Listbox(self.categories_group)
-        self.selected_categories.grid(row=0, column=0, rowspan=4, padx=5, pady=5, sticky=NSEW)
+        self.y_select_categ_scroll = Scrollbar(self.categories_group)
+        self.selected_categories = Listbox(self.categories_group,
+                                           yscrollcommand=self.y_select_categ_scroll.set)
+        self.y_select_categ_scroll.config(command=self.selected_categories.yview)
+        self.selected_categories.grid(row=0, column=0, rowspan=5, padx=5, pady=5, sticky=NSEW)
+        self.y_select_categ_scroll.grid(row=0, column=1, rowspan=5, padx=5, pady=5, sticky=NS)
 
-        self.available_categories = Listbox(self.categories_group)
-        self.available_categories.grid(row=0, column=2, rowspan=4, padx=5, pady=5, sticky=NSEW)
+        self.add_categ_button = Button(self.categories_group, text="<<",
+                                       command=self.on_add_categ_event)
+        self.add_categ_button.grid(row=1, column=2, padx=5, pady=5 )
 
-        self.add_categ_button = Button(self.categories_group, text="<<")
-        self.add_categ_button.grid(row=1, column=1, padx=5, pady=5 )
+        self.del_categ_button = Button(self.categories_group, text=">>",
+                                       command=self.on_del_categ_event)
+        self.del_categ_button.grid(row=2, column=2, padx=5, pady=5)
 
-        self.del_categ_button = Button(self.categories_group, text=">>")
-        self.del_categ_button.grid(row=2, column=1, padx=5, pady=5)
+        self.y_avail_categ_scroll = Scrollbar(self.categories_group)
+        self.available_categories = Listbox(self.categories_group,
+                                            yscrollcommand=self.y_avail_categ_scroll.set)
+        self.y_avail_categ_scroll.config(command=self.available_categories.yview)
+        self.available_categories.grid(row=0, column=3, rowspan=4, padx=5, pady=5, sticky=NSEW)
+        self.y_avail_categ_scroll.grid(row=0, column=4, rowspan=4, padx=5, pady=5, sticky=NS)
+
+        self.new_category_entry = Entry(self.categories_group)
+        self.new_category_entry.grid(row=4, column=3, rowspan=4, padx=5, pady=5, sticky=EW)
+        self.new_category_button = Button(self.categories_group, text="+",
+                                          command=self.on_new_categ_event)
+        self.new_category_entry.bind('<KeyPress-Return>', self.on_new_categ_event)
+        self.new_category_button.grid(row=4, column=4)
 
         self.categories_group.rowconfigure(0, weight=1)
         self.categories_group.rowconfigure(3, weight=1)
         self.categories_group.columnconfigure(0, weight=1)
-        self.categories_group.columnconfigure(2, weight=1)
+        self.categories_group.columnconfigure(3, weight=1)
 
         # Bouton d'actions
         self.add_button = Button(self.detail_frame, text="Ajouter",
@@ -191,14 +208,16 @@ class ManageMyDico(Frame):
             return
 
         # Mise à jour du dictionnaire
-        self.dico.words[self.word_list_frame.index].set(EN, self.en_entry.get())
-        self.dico.words[self.word_list_frame.index].set(FR, self.fr_entry.get())
-        self.dico.words[self.word_list_frame.index].set(INFO, self.info_entry.get())
-# TODO : Ajouter les modiffication des categorires
+        self.dico.words[self.word_list_frame.index][EN] = self.en_entry.get()
+        self.dico.words[self.word_list_frame.index][FR] = self.fr_entry.get()
+        self.dico.words[self.word_list_frame.index][INFO] = self.info_entry.get()
+        self.dico.words[self.word_list_frame.index][CATEGORIES] = \
+            [category for category in self.selected_categories.get(0,END)]
 
         self.en_entry.delete(0, END)
         self.fr_entry.delete(0, END)
         self.info_entry.delete(0, END)
+        self.selected_categories.delete(0,END)
 
         # Ajout dans la liste
         self.update_list()
@@ -218,7 +237,47 @@ class ManageMyDico(Frame):
         self.fr_entry.insert(0, self.dico.words[self.word_list_frame.index].get(FR))
         self.info_entry.delete(0, END)
         self.info_entry.insert(0, self.dico.words[self.word_list_frame.index].get(INFO))
+        # Update selected categories
+        self.selected_categories.delete(0, END)
+        category_used = self.dico.words[self.word_list_frame.index][CATEGORIES]
+        for category in sorted(category_used):
+            self.selected_categories.insert(END, category)
+        # Update available catagories
+        self.available_categories.delete(0,END)
+        for category in sorted(self.dico.categories):
+            if category not in category_used:
+                self.available_categories.insert(END, category)
     #\on_select_event
+
+    def on_add_categ_event(self):
+        """Method executed when the add_categ_button is pressed"""
+        try:
+            index =  self.available_categories.index(ACTIVE)
+        except:
+            return
+        if index>=0:
+            self.selected_categories.insert(END, self.available_categories.selection_get())
+            self.available_categories.delete(index)
+            self.available_categories.selection_set(self.available_categories.index(ACTIVE))
+
+    def on_del_categ_event(self):
+        """Method executed when the del_categ_button is pressed"""
+        try:
+            index =  self.selected_categories.index(ACTIVE)
+        except:
+            return
+        if index>=0:
+            self.available_categories.insert(END, self.selected_categories.selection_get())
+            self.selected_categories.delete(index)
+            self.selected_categories.selection_set(self.selected_categories.index(ACTIVE))
+
+    def on_new_categ_event(self, event=None):
+        """Method executed when the new_categ_button is pressed"""
+        new_categ = self.new_category_entry.get()
+        if new_categ != "" and new_categ not in self.dico.categories:
+            self.available_categories.insert(END,new_categ)
+            self.dico.add_category(new_categ)
+            self.new_category_entry.delete(0, END)
 
     def on_sort_event(self):
         "Répond à l'évènement du choix du tri"
@@ -259,13 +318,13 @@ class ManageMyDico(Frame):
 
         # Recharge la liste des mots
         self.dico.sort_dico(self.sort_option.get())
-        for translate in self.dico.words:
+        for translation in self.dico.words:
             if self.sort_option.get() == EN:
                 self.word_list_frame.insert(END,
-                                            (translate["EN"], translate["FR"], translate["INFO"]))
+                                            (translation[EN], translation[FR], translation[INFO]))
             else:
                 self.word_list_frame.insert(END,
-                                            (translate["FR"], translate["EN"], translate["INFO"]))
+                                            (translation[FR], translation[EN], translation[INFO]))
     #\update_list
 
 # Fin du fichier manage_my_dico.py

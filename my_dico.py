@@ -98,15 +98,10 @@ class MyTranslation:
         except IndexError:
             self.info_word = ""
 
+        self.categories = []
         try:
-            log.debug("type list_args[3]={}".format(type(list_args[3])))
             log.debug("list_args[3]={}".format(list_args[3]))
-            if isinstance(list_args[3], str):
-                self.categories = list_args[3].split(",")
-            elif isinstance(list_args[3], list):
-                self.categories = list_args[3]
-            else:
-                raise ValueError("Error type for the categories argument")
+            self[CATEGORIES] = list_args[3].split(",")
         except IndexError:
             self.categories = []
 
@@ -169,7 +164,7 @@ class MyTranslation:
         """"Retour les Ã©lÃ©ments de traduction"""
         if option == "" or option == "ALL":
             return "{};{};{};{};{};{};{};{}".format(self.en_word, self.fr_word,
-                                                    self.info_word, self.categories,
+                                                    self.info_word, self.categories_str(),
                                                     self.en_count, self.en_err_count,
                                                     self.fr_count, self.fr_err_count)
         elif option == EN:
@@ -194,6 +189,16 @@ class MyTranslation:
             return float(self.fr_ratio_ok)
     #\get
 
+    def categories_str(self):
+        """Create a string of the categories list"""
+        slist = ""
+        for i, category in enumerate(self.categories):
+            if i == 0:
+                slist += "{}".format(category)
+            else:
+                slist += ",{}".format(category)
+        return slist
+
     def set(self, option, value):
         "Modifie la valeur d'un Ã©lÃ©ment de la traduction"
         if value == "":
@@ -206,7 +211,13 @@ class MyTranslation:
             elif option == INFO:
                 self.info_word = value
             elif option == CATEGORIES:
-                self.categories = value
+                if isinstance(value, list):
+                    for category in value:
+                        self.add_category(category)
+                elif isinstance(value, str):
+                    self.add_category(value)
+                else:
+                    raise ValueError("Error type for the categories argument")
             elif option == EN_COUNT:
                 self.en_count = int(value)
                 self.update_english_stats()
@@ -230,8 +241,8 @@ class MyTranslation:
 
     def add_category(self, category):
         """Add a new category for this translation"""
-        if category not in self.categories:
-            self.categories.append(category)
+        if category not in self.categories and category.strip() != "" and category is not None:
+            self.categories.append(category.strip())
 
 
     def del_category(self, category):
@@ -356,8 +367,8 @@ class MyDico:
 
     def add_category(self, category):
         """Add a new category in the dictionnary if not exist yet"""
-        if category not in self.categories:
-            self.categories.append(category)
+        if category not in self.categories and category.strip() != "":
+            self.categories.append(category.strip())
     #\add_category
 
 #OPT : Réduire les différent cas de type de tri par un seul cas générique
